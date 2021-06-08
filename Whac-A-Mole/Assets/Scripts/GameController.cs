@@ -7,24 +7,32 @@ using TMPro;
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
-    public GameObject mainMenu, inGameUI,endScreen,recordPanel;
+    public GameObject mainMenu, inGameUI,endScreen,recordPanel, pauseMenu;
 
     public Transform molesParent;
     private MoleBehaviour[] moles;
 
     public bool playing = false;
 
-    public float gameDuration = 60f;
-    public float timePlayed;
+    public float gameDuration;
+    public float timePlayed = 60f;
 
-    int points = 0;
-    int clicks = 0;
-    int failedClicks = 0;
+    public int points = 0;
+    public int clicks = 0;
+    public int failedClicks = 0;
 
     public TMP_InputField nameField;
     string playerName;
 
     public TextMeshProUGUI infoGame;
+
+    /*AÑADIDO POR CRISTIAN (Además de los public int points, clicks & failedClicks y modificar el timePlayed = 60f, cono gameDuration = 0f.
+    El pauseMenu es un extra, para poder reiniciar y ver que funciona el tiempo y puntos correctamente)*/
+    public TextMeshProUGUI timeText;
+    public TextMeshProUGUI pointsText;
+    public GameObject gameController;
+    public GameObject moleContainer;
+
 
     void Awake()
     {
@@ -65,9 +73,12 @@ public class GameController : MonoBehaviour
     {
         if (playing == true)
         {
-            timePlayed += Time.deltaTime;
+            timePlayed -= Time.deltaTime;
+            timeText.text = timePlayed.ToString("00");
+            pointsText.text = points.ToString("00");
 
-            if (timePlayed >= gameDuration)
+
+            if (timePlayed <= gameDuration)
             {
 
                 ShowEndScreen();
@@ -117,6 +128,7 @@ public class GameController : MonoBehaviour
         endScreen.SetActive(false);
         //Activa juego
         playing = true;
+        EnterOnGame();
 
         //Reinicia moles
         for (int i = 0; i < moles.Length; i++)
@@ -135,7 +147,7 @@ public class GameController : MonoBehaviour
             moles[i].StopMole();
         }
 
-        timePlayed = 0.0f;
+        timePlayed = 60.0f;
         points = 0;
         clicks = 0;
         failedClicks = 0;
@@ -150,6 +162,8 @@ public class GameController : MonoBehaviour
         mainMenu.SetActive(true);
         endScreen.SetActive(false);
         recordPanel.SetActive(false);
+
+        EnterOnGame();
 
     }
 
@@ -177,6 +191,7 @@ public class GameController : MonoBehaviour
                     if (mole != null)
                     {
                         mole.OnHitMole();
+                        points += 100;
                     }
                 }
             }
@@ -199,8 +214,15 @@ public class GameController : MonoBehaviour
     /// Funcion para entrar en pausa, pone playing en false y muestra la pantalla de pausa.
     /// </summary>
     public void EnterOnPause()
-    { 
-    
-    
+    {
+        pauseMenu.SetActive(true);
+        gameController.SetActive(false);
+        moleContainer.SetActive(false);
+    }
+    public void EnterOnGame()
+    {
+        pauseMenu.SetActive(false);
+        gameController.SetActive(true);
+        moleContainer.SetActive(true);
     }
 }
