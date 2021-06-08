@@ -10,7 +10,7 @@ public class GameController : MonoBehaviour
     public GameObject mainMenu, inGameUI,endScreen,recordPanel, pauseMenu;
 
     public Transform molesParent;
-    private MoleBehaviour[] moles;
+    public MoleBehaviour[] moles;
 
     public bool playing = false;
 
@@ -22,10 +22,10 @@ public class GameController : MonoBehaviour
     public float failedClicks = 0;
 
     public TMP_InputField nameField;
-    string playerName;
+    public string playerName;
 
     public TextMeshProUGUI infoGame;
-    public TextMeshProUGUI infoGame2;
+   // public TextMeshProUGUI infoGame2;
 
     /*AÑADIDO POR CRISTIAN (Además de los public int points, clicks & failedClicks y modificar el timePlayed = 60f, cono gameDuration = 0f.
     El pauseMenu es un extra, para poder reiniciar y ver que funciona el tiempo y puntos correctamente). También he añadido un inforGame2 para el mensaje de NO record.*/
@@ -39,6 +39,13 @@ public class GameController : MonoBehaviour
     float clicksPorcentaje;
     float totalClicks;
 
+    public bool pups;
+    public float timeBooleana;
+    public GameObject puBomb;
+    public GameObject puTime;
+
+    public float timerTime = 5f;
+
 
     void Awake()
     {
@@ -51,6 +58,7 @@ public class GameController : MonoBehaviour
             Destroy(this);
         }
 
+        
     }
 
     void ConfigureInstance()
@@ -104,21 +112,26 @@ public class GameController : MonoBehaviour
             
         }
 
-        SaveRecord();
-        recordText.text = PlayerPrefs.GetInt("Record").ToString("0000");
-        //recordText.text = PlayerPrefs.SetString("PlayerName");
-        Debug.Log("Record guardado con éxito");
+        
+
+        if (puTime.activeInHierarchy == true)
+        {
+            timerTime -= Time.deltaTime;
+        }
     }
 
 
     void ShowEndScreen()
     {
         endScreen.SetActive(true);
-        infoGame.text = " Total points : " + points + "\n Record: " + recordText + "\n GoodShot: " + clicksPorcentaje + "%" + "\n BadShots: " + failedClicks;
+        infoGame.text = " Total points : " + points + "\n Record actual: " + recordText + "\n GoodShot: " + clicksPorcentaje + "%" + "\n BadShots: " + failedClicks;
 
         bool isRecord = true;
         //si hay nuevo record mostrar el panel recordPanel
         recordPanel.SetActive(isRecord);
+        SaveRecord();
+        recordText.text += PlayerPrefs.GetInt("Record").ToString("0000");
+        recordText.text += PlayerPrefs.GetString(playerName);
     }
 
     /// <summary>
@@ -177,7 +190,6 @@ public class GameController : MonoBehaviour
         recordPanel.SetActive(false);
 
         EnterOnGame();
-        SaveRecord();
         Debug.Log("Record guardado con éxito");
 
     }
@@ -210,9 +222,27 @@ public class GameController : MonoBehaviour
                         clicks += 1f;
                     }
                 }
-                else if (hitInfo.collider.tag.Equals("PowerUp"))
+                else if (hitInfo.collider.tag.Equals("PowerUp1"))
                 {
                     clicks += 1f;
+
+                    for (int i = 0; i < moles.Length; i++)
+                    {
+                        points += 100;
+                        moles[i].OnHitMole();
+                    }
+                }
+                else if (hitInfo.collider.tag.Equals("PowerUp2"))
+                {
+                    clicks += 1f;
+                    if(timerTime > 0)
+                    {
+                        timePlayed -= (Time.deltaTime - 0.5f);
+                    }
+                    else
+                    {
+                        timePlayed -= Time.deltaTime;
+                    }
                 }
                 else if (hitInfo.collider.tag.Equals("Menu"))
                 {
@@ -261,17 +291,13 @@ public class GameController : MonoBehaviour
         if(points > PlayerPrefs.GetInt("Record"))
         {
             PlayerPrefs.SetInt("Record", points);
-            //PlayerPrefs.SetString("NamePlayer", TMP_InputField.text());
+            PlayerPrefs.SetString("playerName", nameField.text);
             recordPanel.SetActive(true);
         }
-        /*if(points > PlayerPrefs.GetString("NamePlayer"))
-        {
-            PlayerPrefs.SetString("NamePlayer");
-        }*/
         else
         {
             recordPanel.SetActive(false);
-            infoGame2.text = "Record actual: " + recordText + " por Cristian";
+            //infoGame2.text = "Record actual: " + recordText + " por Cristian";
         }
     }
 }

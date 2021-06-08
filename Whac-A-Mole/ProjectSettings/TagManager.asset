@@ -6,7 +6,8 @@ TagManager:
   tags:
   - Mole
   - Menu
-  - PowerUp
+  - PowerUp1
+  - PowerUp2
   layers:
   - Default
   - TransparentFX
