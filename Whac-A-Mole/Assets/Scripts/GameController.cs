@@ -25,13 +25,16 @@ public class GameController : MonoBehaviour
     string playerName;
 
     public TextMeshProUGUI infoGame;
+    public TextMeshProUGUI infoGame2;
 
     /*AÑADIDO POR CRISTIAN (Además de los public int points, clicks & failedClicks y modificar el timePlayed = 60f, cono gameDuration = 0f.
-    El pauseMenu es un extra, para poder reiniciar y ver que funciona el tiempo y puntos correctamente)*/
+    El pauseMenu es un extra, para poder reiniciar y ver que funciona el tiempo y puntos correctamente) También he añadido un inforGame2 para el mensaje de NO record*/
     public TextMeshProUGUI timeText;
     public TextMeshProUGUI pointsText;
     public GameObject gameController;
     public GameObject moleContainer;
+
+    public TextMeshProUGUI recordText;
 
 
     void Awake()
@@ -96,6 +99,11 @@ public class GameController : MonoBehaviour
             }
             
         }
+
+        SaveRecord();
+        recordText.text = PlayerPrefs.GetInt("Record").ToString("0000");
+        recordText.text = PlayerPrefs.GetString("PlayerName");
+        Debug.Log("Record guardado con éxito");
     }
 
 
@@ -104,7 +112,7 @@ public class GameController : MonoBehaviour
         endScreen.SetActive(true);
         infoGame.text = " Total points : " + "000" + "\n Record: " + "100" + "\n 10" + "% good shots \n" + "999" + " bad shots";
 
-        bool isRecord = false;
+        bool isRecord = true;
         //si hay nuevo record mostrar el panel recordPanel
         recordPanel.SetActive(isRecord);
     }
@@ -115,7 +123,8 @@ public class GameController : MonoBehaviour
     public void Retry()
     {
         //Guardar record si es necesario
-
+        SaveRecord();
+        Debug.Log("Record guardado con éxito");
         //Acceso al texto escrito
         playerName = nameField.text;
         Debug.Log("Record de " + playerName);
@@ -164,6 +173,8 @@ public class GameController : MonoBehaviour
         recordPanel.SetActive(false);
 
         EnterOnGame();
+        SaveRecord();
+        Debug.Log("Record guardado con éxito");
 
     }
 
@@ -224,5 +235,23 @@ public class GameController : MonoBehaviour
         pauseMenu.SetActive(false);
         gameController.SetActive(true);
         moleContainer.SetActive(true);
+    }
+
+    public void SaveRecord()
+    {
+        if(points > PlayerPrefs.GetInt("Record"))
+        {
+            PlayerPrefs.SetInt("Record", points);
+            //PlayerPrefs.SetString("NamePlayer").TMP_Inputfield.text;
+            recordPanel.SetActive(true);
+        }
+        /*if(points > PlayerPrefs.GetString("NamePlayer"))
+        {
+            PlayerPrefs.SetString("NamePlayer");
+        }*/
+        else
+        {
+            infoGame2.text = "Record actual: " + recordText + " por Cristian";
+        }
     }
 }
