@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Mole
+  - Menu
+  - PowerUp
   layers:
   - Default
   - TransparentFX
